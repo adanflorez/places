@@ -1,7 +1,7 @@
-@import 'theme_color';
-@import 'fonts';
-@import 'mixin';
-@import 'responsive';
+@import "theme_color";
+@import "fonts";
+@import "mixin";
+@import "responsive";
 
 /* [Master Stylesheet - v1.0] */
 
@@ -40,22 +40,26 @@
 /* :: 1.0 Import Fonts */
 
 @font-face {
-    font-family: 'FuturaLT-Book';
-    src: url('fonts/FuturaLT-Book.eot?#iefix') format('embedded-opentype'), url('fonts/FuturaLT-Book.woff') format('woff'), url('fonts/FuturaLT-Book.ttf') format('truetype'), url('fonts/FuturaLT-Book.svg#FuturaLT-Book') format('svg');
+    font-family: "FuturaLT-Book";
+    src:
+        url("fonts/FuturaLT-Book.eot?#iefix") format("embedded-opentype"),
+        url("fonts/FuturaLT-Book.woff") format("woff"),
+        url("fonts/FuturaLT-Book.ttf") format("truetype"),
+        url("fonts/FuturaLT-Book.svg#FuturaLT-Book") format("svg");
     font-weight: normal;
     font-style: normal;
 }
 
 /* :: 2.0 Import All CSS */
 
-@import 'css/bootstrap.min.css';
-@import 'css/classy-nav.css';
-@import 'css/owl.carousel.min.css';
-@import 'css/animate.css';
-@import 'css/magnific-popup.css';
-@import 'css/font-awesome.min.css';
-@import 'css/nice-select.css';
-@import 'css/travel-icon.css';
+@import "css/bootstrap.min.css";
+@import "css/classy-nav.css";
+@import "css/owl.carousel.min.css";
+@import "css/animate.css";
+@import "css/magnific-popup.css";
+@import "css/font-awesome.min.css";
+@import "css/nice-select.css";
+@import "css/travel-icon.css";
 
 /* :: 3.0 Base CSS */
 
@@ -1170,8 +1174,7 @@ img {
             background-color: rgba(255, 255, 255, 0.85);
             border: 2px solid $pri-color;
             padding: 30px;
-            @include transform(translate(-50%,
-            -50%));
+            @include transform(translate(-50%, -50%));
             @media #{$breakpoint-xs} {
                 width: 85%;
             }
@@ -1459,7 +1462,7 @@ img {
                         position: absolute;
                         top: -2px;
                         right: -18px;
-                        content: '|';
+                        content: "|";
                         z-index: 10;
                     }
                 }
@@ -1622,8 +1625,7 @@ img {
         top: 50%;
         left: 50%;
         text-align: center;
-        @include transform(translate(-50%,
-        -50%));
+        @include transform(translate(-50%, -50%));
         span {
             font-size: 48px;
             color: #232323;
@@ -1828,6 +1830,48 @@ img {
         h6 {
             font-size: 18px;
         }
+    }
+}
+
+/* :: 15.0 Room Details Area CSS */
+.room-details-area {
+    .room-content {
+        h4 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        .price-data {
+            p {
+                font-size: 18px;
+                color: $pri-color;
+                font-weight: 700;
+                margin-bottom: 0;
+            }
+        }
+    }
+    .about-key-text {
+        margin-top: 0;
+        h6 {
+            @include justify-content-start;
+            margin-bottom: 30px;
+        }
+    }
+}
+
+.hotel-reservation--area {
+    background-color: #f5f7f8;
+    padding: 50px 30px;
+    .form-control {
+        height: 50px;
+        border-radius: 0;
+        border: none;
+        font-size: 12px;
+        font-style: italic;
+    }
+    label {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 10px;
     }
 }
 
