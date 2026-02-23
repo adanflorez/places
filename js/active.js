@@ -84,9 +84,31 @@
             autoplayTimeout: 5000,
             smartSpeed: 600
         });
+
+        $('.room-thumbnail-slides').owlCarousel({
+            items: 1,
+            margin: 0,
+            loop: true,
+            nav: true,
+            navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+            dots: false,
+            autoplay: true,
+            autoplayTimeout: 5000,
+            smartSpeed: 600
+        });
     }
 
-    // :: 5.0 ScrollUp Active Code
+    // :: 5.0 Magnific Popup Active Code
+    if ($.fn.magnificPopup) {
+        $('.portfolio-img').magnificPopup({
+            type: 'image',
+            gallery: {
+                enabled: true
+            }
+        });
+    }
+
+    // :: 6.0 ScrollUp Active Code
     if ($.fn.scrollUp) {
         browserWindow.scrollUp({
             scrollSpeed: 1500,
@@ -94,7 +116,7 @@
         });
     }
 
-    // :: 6.0 CounterUp Active Code
+    // :: 7.0 CounterUp Active Code
     if ($.fn.counterUp) {
         $('.counter').counterUp({
             delay: 10,
@@ -102,14 +124,14 @@
         });
     }
 
-    // :: 7.0 Sticky Active Code
+    // :: 8.0 Sticky Active Code
     if ($.fn.sticky) {
         $(".palatin-main-menu").sticky({
             topSpacing: 0
         });
     }
 
-    // :: 8.0 Progress Bar Active Code
+    // :: 9.0 Progress Bar Active Code
     if ($.fn.circleProgress) {
         $('#circle').circleProgress({
             size: 194,
@@ -141,24 +163,24 @@
         });
     }
 
-    // :: 9.0 Tooltip Active Code
+    // :: 10.0 Tooltip Active Code
     if ($.fn.tooltip) {
         $('[data-toggle="tooltip"]').tooltip()
     }
 
-    // :: 10.0 niceScroll Active Code
+    // :: 11.0 niceScroll Active Code
     if ($.fn.niceScroll) {
         $(".album-all-songs").niceScroll({
             background: "#fff"
         });
     }
 
-    // :: 11.0 prevent default a click
+    // :: 12.0 prevent default a click
     $('a[href="#"]').on('click', function ($) {
         $.preventDefault();
     });
 
-    // :: 12.0 wow Active Code
+    // :: 13.0 wow Active Code
     if (browserWindow.width() > 767) {
         new WOW().init();
     }
