@@ -2046,6 +2046,24 @@ img {
   margin-bottom: 10px;
 }
 
+/* :: 16.0 Footer Social Icons CSS */
+.footer-social-info a {
+  display: inline-block;
+  color: #ffffff;
+  background-color: #616161;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  margin-right: 10px;
+  -webkit-transition-duration: 500ms;
+  transition-duration: 500ms;
+}
+.footer-social-info a:hover, .footer-social-info a:focus {
+  background-color: #cb8670;
+}
+
 /* ====== The End ====== */
 
 /*# sourceMappingURL=style.css.map */
