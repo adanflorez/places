@@ -153,85 +153,15 @@
                 </div>
             </div>
 
-            <div class="row justify-content-center">
-
-                <!-- Single Rooms Area -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="single-rooms-area wow fadeInUp" data-wow-delay="100ms">
-                        <!-- Thumbnail -->
-                        <div class="bg-thumbnail bg-img" style="background-image: url(img/bg-img/1.jpg);"></div>
-                        <!-- Price -->
-                        <p class="price-from">Desde $150/noche</p>
-                        <!-- Rooms Text -->
-                        <div class="rooms-text">
-                            <div class="line"></div>
-                            <h4>Villa en la playa</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada lorem maximus mauris sceleri sque.</p>
-                            <!-- Amenities Preview -->
-                            <div class="room-amenities">
-                                <span><i class="fa fa-wifi"></i>WiFi</span>
-                                <span><i class="fa fa-cutlery"></i>Cocina</span>
-                                <span><i class="fa fa-life-ring"></i>Piscina</span>
-                            </div>
-                        </div>
-                        <!-- Book Room -->
-                        <a href="room-details.html" class="book-room-btn btn palatin-btn">Ver lugar</a>
-                    </div>
+            <div class="row justify-content-center" id="featuredPlaces">
+                <div class="col-12 text-center py-5">
+                    <p style="color:#aaa">Cargando lugares...</p>
                 </div>
-
-                <!-- Single Rooms Area -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="single-rooms-area wow fadeInUp" data-wow-delay="300ms">
-                        <!-- Thumbnail -->
-                        <div class="bg-thumbnail bg-img" style="background-image: url(img/bg-img/8.jpg);"></div>
-                        <!-- Price -->
-                        <p class="price-from">Desde $150/noche</p>
-                        <!-- Rooms Text -->
-                        <div class="rooms-text">
-                            <div class="line"></div>
-                            <h4>Retiro en la montaña</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada lorem maximus mauris sceleri sque.</p>
-                            <!-- Amenities Preview -->
-                            <div class="room-amenities">
-                                <span><i class="fa fa-wifi"></i>WiFi</span>
-                                <span><i class="fa fa-life-ring"></i>Piscina</span>
-                                <span><i class="fa fa-refresh"></i>Lavadora</span>
-                            </div>
-                        </div>
-                        <!-- Book Room -->
-                        <a href="room-details.html" class="book-room-btn btn palatin-btn">Ver lugar</a>
-                    </div>
-                </div>
-
-                <!-- Single Rooms Area -->
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="single-rooms-area wow fadeInUp" data-wow-delay="500ms">
-                        <!-- Thumbnail -->
-                        <div class="bg-thumbnail bg-img" style="background-image: url(img/bg-img/9.jpg);"></div>
-                        <!-- Price -->
-                        <p class="price-from">Desde $100/noche</p>
-                        <!-- Rooms Text -->
-                        <div class="rooms-text">
-                            <div class="line"></div>
-                            <h4>Estudio en la ciudad</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec malesuada lorem maximus mauris sceleri sque.</p>
-                            <!-- Amenities Preview -->
-                            <div class="room-amenities">
-                                <span><i class="fa fa-wifi"></i>WiFi</span>
-                                <span><i class="fa fa-cutlery"></i>Cocina</span>
-                                <span><i class="fa fa-tree"></i>Jardín</span>
-                            </div>
-                        </div>
-                        <!-- Book Room -->
-                        <a href="room-details.html" class="book-room-btn btn palatin-btn">Ver lugar</a>
-                    </div>
-                </div>
+            </div>
 
                 <div class="col-12 text-center mb-50 wow fadeInUp" data-wow-delay="700ms">
                     <a href="rooms.html" class="btn palatin-btn">Ver todos los lugares</a>
                 </div>
-
-            </div>
         </div>
     </section>
     <!-- ##### Rooms Area End ##### -->
@@ -286,6 +216,37 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
     <script src="js/plugins/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
-</body>
+    <script src="js/config.js"></script>
+    <script>
+        const DEFAULT_IMG = 'img/bg-img/1.jpg';
+
+        async function loadFeatured() {
+            const places  = await api('GET', '/places/index.php');
+            const grid    = document.getElementById('featuredPlaces');
+            const delays  = [100, 300, 500];
+            const featured = (places ?? []).slice(0, 3);
+
+            if (featured.length === 0) {
+                grid.innerHTML = '<div class="col-12 text-center py-3"><p style="color:#aaa">No hay lugares disponibles.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = featured.map((p, i) => `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="single-rooms-area wow fadeInUp" data-wow-delay="${delays[i]}ms">
+                        <div class="bg-thumbnail bg-img" style="background-image: url(${p.cover_image || DEFAULT_IMG});"></div>
+                        <p class="price-from">Desde $${parseFloat(p.price_per_night).toLocaleString()}/noche</p>
+                        <div class="rooms-text">
+                            <div class="line"></div>
+                            <h4>${p.name}</h4>
+                            <p>${p.location}</p>
+                        </div>
+                        <a href="room-details.html?id=${p.id}" class="book-room-btn btn palatin-btn">Ver lugar</a>
+                    </div>
+                </div>`).join('');
+        }
+
+        loadFeatured();
+    </script>
 
 </html>

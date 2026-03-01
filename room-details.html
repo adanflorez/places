@@ -256,26 +256,71 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
     <script src="js/plugins/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
+    <script src="js/config.js"></script>
     <script>
-        const WA_NUMBER  = '573163625781';
+        const WA_NUMBER = '573163625781';
+        const id        = new URLSearchParams(location.search).get('id');
 
+        if (!id) window.location.href = 'rooms.html';
+
+        async function loadPlace() {
+            const place = await api('GET', `/places/index.php?id=${id}`);
+            if (!place || !place.id) { window.location.href = 'rooms.html'; return; }
+
+            // Título de la página
+            document.title = `${place.name} — The Palatin`;
+
+            // Imágenes del carrusel
+            const carousel = document.querySelector('.room-thumbnail-slides');
+            if (place.images && place.images.length > 0) {
+                carousel.innerHTML = place.images
+                    .map(img => `<a href="${img.url}" class="portfolio-img"><img src="${img.url}" alt="${place.name}"></a>`)
+                    .join('');
+            }
+
+            // Contenido principal
+            document.querySelector('.room-content h4').textContent        = place.name;
+            document.querySelector('.room-content .price-data p').textContent = `Desde $${parseFloat(place.price_per_night).toLocaleString()}/noche`;
+            document.querySelector('.room-content > p').textContent        = place.description;
+
+            // Amenidades
+            const amenitiesContainer = document.querySelector('.room-amenities-area .row');
+            if (place.amenities && place.amenities.length > 0) {
+                amenitiesContainer.innerHTML = place.amenities.map(a => `
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="single-amenity">
+                            <h6><span class="${a.icon}"></span> ${a.name}</h6>
+                        </div>
+                    </div>`).join('');
+            } else {
+                amenitiesContainer.innerHTML = '<div class="col-12"><p style="color:#aaa">Sin amenidades registradas.</p></div>';
+            }
+
+            // Máximo de huéspedes en el select
+            const guestsSelect = document.getElementById('guests');
+            guestsSelect.innerHTML = '';
+            for (let i = 1; i <= place.max_guests; i++) {
+                guestsSelect.innerHTML += `<option value="${i}">${String(i).padStart(2,'0')}</option>`;
+            }
+        }
+
+        loadPlace();
+
+        // WhatsApp con datos del lugar
         document.getElementById('reservationForm').addEventListener('submit', function (e) {
             e.preventDefault();
-
             const placeName = document.querySelector('.room-content h4')?.textContent?.trim() || 'el lugar';
             const checkIn   = document.getElementById('checkIn').value;
             const checkOut  = document.getElementById('checkOut').value;
             const guests    = document.getElementById('guests').value;
 
             let mensaje = `Hola, estoy interesado en reservar *${placeName}*.`;
-
             if (checkIn)  mensaje += `\nEntrada: *${checkIn}*`;
             if (checkOut) mensaje += `\nSalida: *${checkOut}*`;
             mensaje += `\nHuespedes: *${guests}*`;
             mensaje += `\n\n¿Podria confirmarme la disponibilidad?`;
 
-            const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(mensaje)}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(mensaje)}`, '_blank');
         });
     </script>
 
