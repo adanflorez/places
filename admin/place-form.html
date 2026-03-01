@@ -64,6 +64,24 @@
                         <a href="places.html" class="btn" style="background:#eee;color:#333">Cancelar</a>
                     </div>
                 </form>
+
+                <!-- Sección de imágenes: solo visible al editar -->
+                <div id="imagesSection" style="display:none;margin-top:2rem" class="form-card">
+                    <h3 style="font-size:1rem;font-weight:600;margin-bottom:1.2rem">Imágenes del lugar</h3>
+
+                    <!-- Subir nueva imagen -->
+                    <div class="form-group" style="display:flex;gap:.75rem;align-items:flex-end">
+                        <div style="flex:1">
+                            <label>Subir imagen <span style="color:#aaa;font-weight:400">(JPG, PNG o WebP — máx. 5 MB)</span></label>
+                            <input type="file" id="imageFile" accept="image/jpeg,image/png,image/webp">
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="uploadImage()">Subir</button>
+                    </div>
+                    <div id="uploadAlert" class="alert" style="display:none"></div>
+
+                    <!-- Galería de imágenes actuales -->
+                    <div id="imagesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-top:1rem"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -122,9 +140,79 @@
             await loadAmenities(selectedIds);
         }
 
-        loadPlace();
+        // Mostrar sección de imágenes y cargarlas si es edición
+        async function loadImages() {
+            if (!placeId) return;
+            document.getElementById('imagesSection').style.display = 'block';
 
-        // Guardar
+            const place = await api('GET', `/places/index.php?id=${placeId}`);
+            renderImages(place?.images ?? []);
+        }
+
+        function renderImages(images) {
+            const grid = document.getElementById('imagesGrid');
+            if (images.length === 0) {
+                grid.innerHTML = '<p style="color:#aaa;font-size:.875rem">No hay imágenes aún. Sube la primera.</p>';
+                return;
+            }
+            grid.innerHTML = images.map(img => `
+                <div style="position:relative;border-radius:8px;overflow:hidden;border:2px solid ${img.is_cover ? 'var(--primary)' : '#eee'}">
+                    <img src="/${img.url}" style="width:100%;height:120px;object-fit:cover;display:block">
+                    <div style="padding:.5rem;background:#fff;display:flex;gap:.35rem;flex-wrap:wrap">
+                        ${!img.is_cover ? `<button onclick="setCover(${img.id})" class="btn btn-sm btn-primary" style="flex:1;justify-content:center">Portada</button>` : `<span style="font-size:.75rem;color:var(--primary);font-weight:600;padding:.3rem 0">Portada actual</span>`}
+                        <button onclick="deleteImage(${img.id})" class="btn btn-sm btn-danger" style="flex:1;justify-content:center">Eliminar</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function uploadImage() {
+            const file      = document.getElementById('imageFile').files[0];
+            const alertEl   = document.getElementById('uploadAlert');
+            alertEl.style.display = 'none';
+
+            if (!file) { showUploadAlert('Selecciona una imagen primero', 'error'); return; }
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('place_id', placeId);
+
+            const headers = {};
+            const token   = Auth.getToken();
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const res  = await fetch(`${API_BASE}/places/images.php`, { method: 'POST', headers, body: formData });
+            const data = await res.json();
+
+            if (data?.error) {
+                showUploadAlert(data.error, 'error');
+            } else {
+                document.getElementById('imageFile').value = '';
+                showUploadAlert('Imagen subida correctamente', 'success');
+                loadImages();
+            }
+        }
+
+        async function setCover(imageId) {
+            await api('PUT', `/places/images.php?id=${imageId}`);
+            loadImages();
+        }
+
+        async function deleteImage(imageId) {
+            if (!confirm('¿Eliminar esta imagen?')) return;
+            await api('DELETE', `/places/images.php?id=${imageId}`);
+            loadImages();
+        }
+
+        function showUploadAlert(msg, type) {
+            const el = document.getElementById('uploadAlert');
+            el.textContent   = msg;
+            el.className     = `alert alert-${type}`;
+            el.style.display = 'block';
+        }
+
+        loadPlace();
+        loadImages();
+
         document.getElementById('placeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const alertEl = document.getElementById('alert');

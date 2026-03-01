@@ -2,3 +2,4 @@ db/
 .env
 /api/vendor/
 ROADMAP.md
+uploads/places/*

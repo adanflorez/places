@@ -273,9 +273,27 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
             // Imágenes del carrusel
             const carousel = document.querySelector('.room-thumbnail-slides');
             if (place.images && place.images.length > 0) {
+                // Destruir instancia previa de Owl Carousel
+                $(carousel).trigger('destroy.owl.carousel').removeClass('owl-loaded owl-drag');
                 carousel.innerHTML = place.images
                     .map(img => `<a href="${img.url}" class="portfolio-img"><img src="${img.url}" alt="${place.name}"></a>`)
                     .join('');
+                // Reinicializar con los nuevos items
+                $(carousel).owlCarousel({
+                    items: 1,
+                    margin: 0,
+                    loop: place.images.length > 1,
+                    nav: true,
+                    navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+                    dots: false,
+                    autoplay: true,
+                    autoplayTimeout: 5000,
+                    smartSpeed: 600
+                });
+                // Reinicializar Magnific Popup para las nuevas imágenes
+                if ($.fn.magnificPopup) {
+                    $(carousel).find('.portfolio-img').magnificPopup({ type: 'image', gallery: { enabled: true } });
+                }
             }
 
             // Contenido principal
