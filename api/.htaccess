@@ -1,0 +1,13 @@
+Options -Indexes
+RewriteEngine On
+
+# Rutas de places
+RewriteRule ^places/?$           places/index.php    [L,QSA]
+RewriteRule ^places/([0-9]+)/?$  places/index.php?id=$1 [L,QSA]
+
+# Rutas de auth
+RewriteRule ^auth/login/?$       auth/login.php      [L,QSA]
+
+# Rutas de reservations
+RewriteRule ^reservations/?$           reservations/index.php    [L,QSA]
+RewriteRule ^reservations/([0-9]+)/?$  reservations/index.php?id=$1 [L,QSA]
