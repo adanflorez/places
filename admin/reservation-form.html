@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nueva reserva — The Palatin Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <div id="sidebar"></div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <h2>Nueva reserva</h2>
+                    <small><a href="reservations.html" style="color:#888">← Volver a reservas</a></small>
+                </div>
+            </div>
+
+            <div class="page">
+                <div id="alert" class="alert" style="display:none"></div>
+
+                <form class="form-card" id="reservationForm">
+
+                    <div class="form-group">
+                        <label>Lugar</label>
+                        <select id="place_id" required>
+                            <option value="">Selecciona un lugar...</option>
+                        </select>
+                    </div>
+
+                    <!-- Info del lugar seleccionado -->
+                    <div id="placeInfo" style="display:none;background:#f8f9fa;border-radius:8px;padding:1rem;margin-bottom:1.2rem;font-size:.875rem">
+                        <strong id="placeName"></strong><br>
+                        <span id="placeLocation" style="color:#888"></span><br>
+                        <span>Precio: <strong id="placePrice"></strong>/noche</span> &nbsp;·&nbsp;
+                        <span>Máx. huéspedes: <strong id="placeMaxGuests"></strong></span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Fecha de entrada</label>
+                            <input type="date" id="check_in" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha de salida</label>
+                            <input type="date" id="check_out" required>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de noches y precio -->
+                    <div id="priceSummary" style="display:none;background:#fff3cd;border-radius:8px;padding:.75rem 1rem;margin-bottom:1.2rem;font-size:.875rem">
+                        🌙 <strong id="nightsCount"></strong> noches &nbsp;·&nbsp;
+                        Total estimado: <strong id="totalPrice"></strong>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Número de huéspedes</label>
+                        <input type="number" id="guests" required min="1" value="1">
+                    </div>
+
+                    <hr style="margin:1.5rem 0;border-color:#f0f0f0">
+                    <p style="font-size:.875rem;color:#888;margin-bottom:1rem">Datos del huésped</p>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre completo</label>
+                            <input type="text" id="guest_name" required placeholder="Juan Pérez">
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono / WhatsApp</label>
+                            <input type="text" id="guest_phone" required placeholder="+57 300 123 4567">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" id="guest_email" required placeholder="juan@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notas adicionales <span style="color:#aaa;font-weight:400">(opcional)</span></label>
+                        <textarea id="notes" placeholder="Indicaciones especiales, horario de llegada..."></textarea>
+                    </div>
+
+                    <div style="display:flex;gap:.75rem;margin-top:1rem">
+                        <button type="submit" class="btn btn-primary">Crear reserva</button>
+                        <a href="reservations.html" class="btn" style="background:#eee;color:#333">Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        Auth.require();
+
+        fetch('sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar').innerHTML = html;
+            document.querySelector('[data-page="reservations"]')?.classList.add('active');
+        });
+
+        let places = [];
+
+        // Cargar lugares disponibles
+        async function loadPlaces() {
+            places = await api('GET', '/places/index.php') ?? [];
+            const select = document.getElementById('place_id');
+            places.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value       = p.id;
+                opt.textContent = `${p.name} — ${p.location}`;
+                select.appendChild(opt);
+            });
+        }
+
+        // Mostrar info del lugar al seleccionar
+        document.getElementById('place_id').addEventListener('change', function () {
+            const place = places.find(p => p.id == this.value);
+            const info  = document.getElementById('placeInfo');
+
+            if (!place) { info.style.display = 'none'; return; }
+
+            document.getElementById('placeName').textContent     = place.name;
+            document.getElementById('placeLocation').textContent = place.location;
+            document.getElementById('placePrice').textContent    = `$${parseFloat(place.price_per_night).toLocaleString()}`;
+            document.getElementById('placeMaxGuests').textContent = place.max_guests;
+            document.getElementById('guests').max                = place.max_guests;
+            info.style.display = 'block';
+            calcTotal();
+        });
+
+        // Calcular noches y total
+        function calcTotal() {
+            const placeId  = document.getElementById('place_id').value;
+            const checkIn  = document.getElementById('check_in').value;
+            const checkOut = document.getElementById('check_out').value;
+            const summary  = document.getElementById('priceSummary');
+
+            if (!placeId || !checkIn || !checkOut || checkIn >= checkOut) {
+                summary.style.display = 'none'; return;
+            }
+
+            const place  = places.find(p => p.id == placeId);
+            const nights = Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000);
+            const total  = nights * parseFloat(place.price_per_night);
+
+            document.getElementById('nightsCount').textContent = nights;
+            document.getElementById('totalPrice').textContent  = `$${total.toLocaleString()}`;
+            summary.style.display = 'block';
+        }
+
+        document.getElementById('check_in').addEventListener('change', calcTotal);
+        document.getElementById('check_out').addEventListener('change', calcTotal);
+
+        // Enviar formulario
+        document.getElementById('reservationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const alertEl = document.getElementById('alert');
+            alertEl.style.display = 'none';
+
+            const body = {
+                place_id:    parseInt(document.getElementById('place_id').value),
+                check_in:    document.getElementById('check_in').value,
+                check_out:   document.getElementById('check_out').value,
+                guests:      parseInt(document.getElementById('guests').value),
+                guest_name:  document.getElementById('guest_name').value,
+                guest_email: document.getElementById('guest_email').value,
+                guest_phone: document.getElementById('guest_phone').value,
+                notes:       document.getElementById('notes').value || null,
+            };
+
+            const data = await api('POST', '/reservations/index.php', body);
+
+            if (data?.error) {
+                alertEl.textContent   = data.error;
+                alertEl.className     = 'alert alert-error';
+                alertEl.style.display = 'block';
+            } else {
+                alertEl.textContent   = `Reserva creada — ${data.nights} noches · Total: $${data.total_price.toLocaleString()}`;
+                alertEl.className     = 'alert alert-success';
+                alertEl.style.display = 'block';
+                setTimeout(() => window.location.href = 'reservations.html', 1500);
+            }
+        });
+
+        loadPlaces();
+    </script>
+</body>
+</html>

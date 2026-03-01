@@ -82,6 +82,7 @@ function showReservation(int $id): void {
 }
 
 function createReservation(): void {
+    authRequired(); // solo el admin puede crear reservas
     $body     = json_decode(file_get_contents('php://input'), true);
     $required = ['place_id', 'guest_name', 'guest_email', 'guest_phone', 'check_in', 'check_out', 'guests'];
 

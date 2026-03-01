@@ -173,7 +173,7 @@
                 <!-- Room Sidebar -->
                 <div class="col-12 col-lg-4">
                     <div class="hotel-reservation--area">
-                        <form action="#" method="post">
+                        <form id="reservationForm">
                             <div class="form-group mb-30">
                                 <label for="checkIn">Entrada</label>
                                 <input type="date" class="form-control" id="checkIn">
@@ -195,7 +195,9 @@
                                     <option value="7">07</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn palatin-btn w-100">Verificar disponibilidad</button>
+                            <button type="submit" class="btn palatin-btn w-100">
+                                <span class="fa fa-whatsapp"></span> Consultar disponibilidad
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -254,6 +256,27 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
     <script src="js/plugins/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
-</body>
+    <script>
+        const WA_NUMBER  = '573163625781';
+
+        document.getElementById('reservationForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const placeName = document.querySelector('.room-content h4')?.textContent?.trim() || 'el lugar';
+            const checkIn   = document.getElementById('checkIn').value;
+            const checkOut  = document.getElementById('checkOut').value;
+            const guests    = document.getElementById('guests').value;
+
+            let mensaje = `Hola, estoy interesado en reservar *${placeName}*.`;
+
+            if (checkIn)  mensaje += `\nEntrada: *${checkIn}*`;
+            if (checkOut) mensaje += `\nSalida: *${checkOut}*`;
+            mensaje += `\nHuespedes: *${guests}*`;
+            mensaje += `\n\n¿Podria confirmarme la disponibilidad?`;
+
+            const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+        });
+    </script>
 
 </html>
