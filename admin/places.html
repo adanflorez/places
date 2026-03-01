@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lugares — The Palatin Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <div id="sidebar"></div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div><h2>Lugares</h2><small>Gestión de alojamientos</small></div>
+                <a href="place-form.html" class="btn btn-primary">+ Nuevo lugar</a>
+            </div>
+
+            <div class="page">
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Ubicación</th>
+                                <th>Precio/noche</th>
+                                <th>Huéspedes</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="placesTable">
+                            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        Auth.require();
+
+        fetch('sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar').innerHTML = html;
+            document.querySelector('[data-page="places"]')?.classList.add('active');
+        });
+
+        async function loadPlaces() {
+            const places = await api('GET', '/places/index.php');
+            const tbody  = document.getElementById('placesTable');
+
+            tbody.innerHTML = places?.length ? places.map(p => `
+                <tr>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.location}</td>
+                    <td>$${parseFloat(p.price_per_night).toLocaleString()}</td>
+                    <td>${p.max_guests}</td>
+                    <td><span class="badge ${p.is_active ? 'badge-confirmed' : 'badge-cancelled'}">${p.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>
+                        <a href="place-form.html?id=${p.id}" class="btn btn-sm btn-primary">Editar</a>
+                        <button onclick="deletePlace(${p.id})" class="btn btn-sm btn-danger">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">No hay lugares registrados</td></tr>';
+        }
+
+        async function deletePlace(id) {
+            if (!confirm('¿Eliminar este lugar?')) return;
+            await api('DELETE', `/places/index.php?id=${id}`);
+            loadPlaces();
+        }
+
+        loadPlaces();
+    </script>
+</body>
+</html>

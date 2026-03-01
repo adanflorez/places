@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reservas — The Palatin Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <div id="sidebar"></div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div><h2>Reservas</h2><small>Gestión de reservas</small></div>
+                <div style="display:flex;gap:.5rem;align-items:center">
+                    <select id="filterStatus" class="btn" style="background:#fff;border:1px solid #ddd">
+                        <option value="">Todos los estados</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="confirmed">Confirmadas</option>
+                        <option value="cancelled">Canceladas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Huésped</th>
+                                <th>Lugar</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Huéspedes</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationsTable">
+                            <tr><td colspan="8" style="text-align:center;color:#aaa;padding:2rem">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        Auth.require();
+
+        fetch('sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar').innerHTML = html;
+            document.querySelector('[data-page="reservations"]')?.classList.add('active');
+        });
+
+        async function loadReservations() {
+            const status = document.getElementById('filterStatus').value;
+            const query  = status ? `?status=${status}` : '';
+            const rows   = await api('GET', `/reservations/index.php${query}`);
+            const tbody  = document.getElementById('reservationsTable');
+
+            tbody.innerHTML = rows?.length ? rows.map(r => `
+                <tr>
+                    <td>
+                        <strong>${r.guest_name}</strong><br>
+                        <small style="color:#888">${r.guest_email}</small>
+                    </td>
+                    <td>${r.place_name}</td>
+                    <td>${r.check_in}</td>
+                    <td>${r.check_out}</td>
+                    <td>${r.guests}</td>
+                    <td>$${parseFloat(r.total_price).toLocaleString()}</td>
+                    <td><span class="badge badge-${r.status}">${r.status}</span></td>
+                    <td>
+                        ${r.status === 'pending' ? `
+                            <button onclick="updateStatus(${r.id}, 'confirmed')" class="btn btn-sm btn-primary">Confirmar</button>
+                            <button onclick="updateStatus(${r.id}, 'cancelled')" class="btn btn-sm btn-danger">Cancelar</button>
+                        ` : '—'}
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="8" style="text-align:center;color:#aaa;padding:2rem">Sin reservas</td></tr>';
+        }
+
+        async function updateStatus(id, status) {
+            await api('PUT', `/reservations/index.php?id=${id}`, { status });
+            loadReservations();
+        }
+
+        document.getElementById('filterStatus').addEventListener('change', loadReservations);
+        loadReservations();
+    </script>
+</body>
+</html>

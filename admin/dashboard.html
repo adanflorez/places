@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard — The Palatin Admin</title>
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <div id="sidebar"></div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <div>
+                    <h2>Dashboard</h2>
+                    <small id="greeting"></small>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="value" id="statPlaces">—</div>
+                        <div class="label">Lugares activos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="statPending">—</div>
+                        <div class="label">Reservas pendientes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="statConfirmed">—</div>
+                        <div class="label">Reservas confirmadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="value" id="statRevenue">—</div>
+                        <div class="label">Ingresos confirmados</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Últimas reservas</h3>
+                        <a href="reservations.html" class="btn btn-primary btn-sm">Ver todas</a>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Huésped</th>
+                                <th>Lugar</th>
+                                <th>Check-in</th>
+                                <th>Check-out</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentReservations">
+                            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script>
+        Auth.require();
+
+        // Cargar sidebar
+        fetch('sidebar.html').then(r => r.text()).then(html => {
+            document.getElementById('sidebar').innerHTML = html;
+            document.querySelector('[data-page="dashboard"]')?.classList.add('active');
+        });
+
+        document.getElementById('greeting').textContent = `Bienvenido, ${Auth.getUser().name}`;
+
+        async function loadDashboard() {
+            const [places, reservations] = await Promise.all([
+                api('GET', '/places/index.php'),
+                api('GET', '/reservations/index.php'),
+            ]);
+
+            document.getElementById('statPlaces').textContent    = places?.length ?? 0;
+            document.getElementById('statPending').textContent   = reservations?.filter(r => r.status === 'pending').length ?? 0;
+            document.getElementById('statConfirmed').textContent = reservations?.filter(r => r.status === 'confirmed').length ?? 0;
+
+            const revenue = reservations
+                ?.filter(r => r.status === 'confirmed')
+                .reduce((sum, r) => sum + parseFloat(r.total_price), 0) ?? 0;
+            document.getElementById('statRevenue').textContent = `$${revenue.toLocaleString()}`;
+
+            const recent = (reservations ?? []).slice(0, 8);
+            const tbody  = document.getElementById('recentReservations');
+
+            tbody.innerHTML = recent.length ? recent.map(r => `
+                <tr>
+                    <td>${r.guest_name}</td>
+                    <td>${r.place_name}</td>
+                    <td>${r.check_in}</td>
+                    <td>${r.check_out}</td>
+                    <td>$${parseFloat(r.total_price).toLocaleString()}</td>
+                    <td><span class="badge badge-${r.status}">${r.status}</span></td>
+                </tr>
+            `).join('') : '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:2rem">Sin reservas aún</td></tr>';
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>
