@@ -1175,6 +1175,41 @@ img {
 .single-rooms-area:hover .rooms-text, .single-rooms-area:focus .rooms-text {
   background-color: #000;
 }
+.single-rooms-area .rooms-text .room-amenities {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(203, 134, 112, 0.45);
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+.single-rooms-area .rooms-text .room-amenities span {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 5px;
+  color: #ccc;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.single-rooms-area .rooms-text .room-amenities span i {
+  font-size: 18px;
+  color: #cb8670;
+}
 
 .pagination-area {
   position: relative;
