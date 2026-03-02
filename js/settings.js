@@ -26,6 +26,19 @@ _settingsPromise.then(cfg => {
                 node.textContent = node.textContent.replace(/The Palatin/g, cfg.site_name);
             }
         });
+
+        // Actualiza meta tags con el nombre del sitio
+        document.querySelectorAll('[property="og:site_name"]').forEach(m => m.content = cfg.site_name);
+        document.querySelectorAll('[property="og:title"], [name="twitter:title"]').forEach(m => {
+            m.content = m.content.replace(/The Palatin/g, cfg.site_name);
+        });
+        document.querySelectorAll('[name="description"], [property="og:description"], [name="twitter:description"]').forEach(m => {
+            if (cfg.site_description && m.content.includes('Mediamos entre viajeros')) {
+                m.content = cfg.site_description;
+            } else {
+                m.content = m.content.replace(/The Palatin/g, cfg.site_name);
+            }
+        });
     }
 
     // --- Logo vs nombre: muestra uno u otro según configuración ---
