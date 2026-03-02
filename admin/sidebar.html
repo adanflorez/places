@@ -1,7 +1,6 @@
 <!-- sidebar reutilizable — se incluye con JS -->
 <aside class="sidebar">
     <div class="sidebar-brand">
-        <span id="admin-site-name">The Palatin</span>
         <span>Panel de administración</span>
     </div>
     <nav>
@@ -11,13 +10,7 @@
         <a href="settings.html"    data-page="settings">     ⚙️ Configuración</a>
     </nav>
     <div class="sidebar-footer">
+        <a href="../index.html" class="btn-site" target="_blank">🌐 Ver sitio</a>
         <button onclick="Auth.logout()">⬅ Cerrar sesión</button>
     </div>
 </aside>
-<script>
-    api('GET', '/settings/index.php').then(s => {
-        if (s?.site_name) {
-            document.getElementById('admin-site-name').textContent = s.site_name;
-        }
-    });
-</script>

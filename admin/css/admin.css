@@ -68,8 +68,12 @@ body {
 .sidebar-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
 }
-.sidebar-footer button {
+.sidebar-footer button,
+.sidebar-footer .btn-site {
     background: none;
     border: 1px solid rgba(255,255,255,.2);
     color: #ccc;
@@ -79,8 +83,13 @@ body {
     width: 100%;
     font-size: .85rem;
     transition: background .2s;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    box-sizing: border-box;
 }
-.sidebar-footer button:hover { background: rgba(255,255,255,.07); }
+.sidebar-footer button:hover,
+.sidebar-footer .btn-site:hover { background: rgba(255,255,255,.07); }
 
 .main-content {
     margin-left: var(--sidebar-w);
