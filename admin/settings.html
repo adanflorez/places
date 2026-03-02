@@ -5,82 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Configuración — The Palatin Admin</title>
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 <div class="admin-layout">
     <div id="sidebar"></div>
 
     <main class="main-content">
-        <div class="page-header">
-            <h1>Configuración del sitio</h1>
+        <div class="topbar">
+            <div><h2>Configuración</h2><small>Ajustes generales del sitio</small></div>
+            <button form="settingsForm" type="submit" class="btn btn-primary">Guardar cambios</button>
         </div>
 
-        <div id="alert" class="alert" style="display:none"></div>
+        <div class="page">
+            <div id="alert" class="alert" style="display:none;margin-bottom:1.5rem"></div>
 
-        <form id="settingsForm" class="card" style="padding:2rem;max-width:720px">
+            <form id="settingsForm" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start">
 
-            <h5 style="margin-bottom:1.5rem;color:var(--primary)">Identidad</h5>
+                <!-- Columna izquierda: Identidad -->
+                <div class="card" style="padding:1.75rem">
+                    <h5 style="margin-bottom:1.5rem;color:var(--primary)">Identidad</h5>
 
-            <div class="form-group">
-                <label class="form-label">Nombre del sitio</label>
-                <input id="site_name" type="text" class="form-control" placeholder="The Palatin">
-            </div>
+                    <div class="form-group">
+                        <label class="form-label">Nombre del sitio</label>
+                        <input id="site_name" type="text" class="form-control" placeholder="The Palatin">
+                    </div>
 
-            <div class="form-group">
-                <label class="form-label">Logo</label>
-                <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
-                    <input id="site_logo" type="text" class="form-control" placeholder="img/core-img/logo.png" style="flex:1;min-width:200px">
-                    <label class="btn btn-secondary" style="cursor:pointer;margin:0">
-                        Subir archivo
-                        <input id="logoFile" type="file" accept="image/*" style="display:none">
-                    </label>
+                    <div class="form-group">
+                        <label class="form-label">Logo</label>
+                        <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+                            <input id="site_logo" type="text" class="form-control" placeholder="img/core-img/logo.png" style="flex:1;min-width:150px">
+                            <label class="btn btn-secondary" style="cursor:pointer;margin:0;white-space:nowrap">
+                                Subir archivo
+                                <input id="logoFile" type="file" accept="image/*" style="display:none">
+                            </label>
+                        </div>
+                        <div id="logoPreview" style="margin-top:.75rem;display:none">
+                            <img id="logoImg" style="max-height:60px;border-radius:6px;border:1px solid #eee;padding:4px;background:#555" alt="preview logo">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0">
+                        <label class="form-label">Descripción (footer)</label>
+                        <textarea id="site_description" class="form-control" rows="4" placeholder="Descripción breve que aparece en el pie de página"></textarea>
+                    </div>
                 </div>
-                <div id="logoPreview" style="margin-top:.75rem;display:none">
-                    <img id="logoImg" style="max-height:60px;border-radius:6px;border:1px solid #eee;padding:4px;background:#555" alt="preview logo">
+
+                <!-- Columna derecha: Contacto + Redes -->
+                <div style="display:flex;flex-direction:column;gap:1.5rem">
+
+                    <div class="card" style="padding:1.75rem">
+                        <h5 style="margin-bottom:1.5rem;color:var(--primary)">Contacto</h5>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">WhatsApp <small style="color:#aaa">(sin + ni espacios)</small></label>
+                            <input id="whatsapp" type="text" class="form-control" placeholder="573163625781">
+                        </div>
+                    </div>
+
+                    <div class="card" style="padding:1.75rem">
+                        <h5 style="margin-bottom:1.5rem;color:var(--primary)">Redes sociales <small style="color:#aaa;font-weight:400;font-size:.85rem">(vacío = ocultar)</small></h5>
+
+                        <div class="form-group">
+                            <label class="form-label"><i class="fa fa-facebook"></i> Facebook</label>
+                            <input id="social_facebook" type="url" class="form-control" placeholder="https://facebook.com/tupagina">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fa fa-instagram"></i> Instagram</label>
+                            <input id="social_instagram" type="url" class="form-control" placeholder="https://instagram.com/tupagina">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fa fa-twitter"></i> Twitter / X</label>
+                            <input id="social_twitter" type="url" class="form-control" placeholder="https://x.com/tupagina">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label"><i class="fa fa-telegram"></i> Telegram</label>
+                            <input id="social_telegram" type="url" class="form-control" placeholder="https://t.me/tupagina">
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Descripción (footer)</label>
-                <textarea id="site_description" class="form-control" rows="3" placeholder="Descripción breve que aparece en el pie de página"></textarea>
-            </div>
-
-            <hr style="margin:1.5rem 0;border-color:#f0f0f0">
-            <h5 style="margin-bottom:1.5rem;color:var(--primary)">Contacto</h5>
-
-            <div class="form-group">
-                <label class="form-label">WhatsApp <small style="color:#aaa">(número sin + ni espacios, ej: 573163625781)</small></label>
-                <input id="whatsapp" type="text" class="form-control" placeholder="573163625781">
-            </div>
-
-            <hr style="margin:1.5rem 0;border-color:#f0f0f0">
-            <h5 style="margin-bottom:1.5rem;color:var(--primary)">Redes sociales <small style="color:#aaa;font-weight:400">(dejar vacío para ocultar)</small></h5>
-
-            <div class="form-group">
-                <label class="form-label"><i class="fa fa-facebook"></i> Facebook</label>
-                <input id="social_facebook" type="url" class="form-control" placeholder="https://facebook.com/tupagina">
-            </div>
-            <div class="form-group">
-                <label class="form-label"><i class="fa fa-instagram"></i> Instagram</label>
-                <input id="social_instagram" type="url" class="form-control" placeholder="https://instagram.com/tupagina">
-            </div>
-            <div class="form-group">
-                <label class="form-label"><i class="fa fa-twitter"></i> Twitter / X</label>
-                <input id="social_twitter" type="url" class="form-control" placeholder="https://x.com/tupagina">
-            </div>
-            <div class="form-group">
-                <label class="form-label"><i class="fa fa-telegram"></i> Telegram</label>
-                <input id="social_telegram" type="url" class="form-control" placeholder="https://t.me/tupagina">
-            </div>
-
-            <div style="display:flex;gap:1rem;margin-top:1rem">
-                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-            </div>
-        </form>
+            </form>
+        </div>
     </main>
 </div>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script src="js/config.js"></script>
 <script>
     Auth.require();
@@ -93,22 +101,17 @@
     const fields = ['site_name','site_logo','site_description','whatsapp',
                     'social_facebook','social_instagram','social_twitter','social_telegram'];
 
-    // Preview del logo al cambiar el campo texto
     document.getElementById('site_logo').addEventListener('input', function () {
-        const preview = document.getElementById('logoPreview');
-        const img     = document.getElementById('logoImg');
-        if (this.value) { img.src = this.value; preview.style.display = 'block'; }
-        else            { preview.style.display = 'none'; }
+        const img = document.getElementById('logoImg');
+        if (this.value) { img.src = this.value; document.getElementById('logoPreview').style.display = 'block'; }
+        else            { document.getElementById('logoPreview').style.display = 'none'; }
     });
 
-    // Subida de archivo de logo
     document.getElementById('logoFile').addEventListener('change', async function () {
         const file = this.files[0];
         if (!file) return;
-
         const formData = new FormData();
         formData.append('logo', file);
-
         const token = Auth.getToken();
         const res   = await fetch(`${API_BASE}/settings/logo.php`, {
             method: 'POST',
@@ -116,18 +119,15 @@
             body: formData,
         });
         const data = await res.json();
-
         if (data?.url) {
             document.getElementById('site_logo').value = data.url;
-            const img = document.getElementById('logoImg');
-            img.src   = data.url;
+            document.getElementById('logoImg').src     = data.url;
             document.getElementById('logoPreview').style.display = 'block';
         } else {
             alert(data?.error || 'Error al subir el logo');
         }
     });
 
-    // Cargar settings actuales
     async function loadSettings() {
         const data = await api('GET', '/settings/index.php');
         if (!data) return;
@@ -135,10 +135,8 @@
             const el = document.getElementById(key);
             if (el) el.value = data[key] ?? '';
         });
-        // mostrar preview si hay logo
-        const logo = data['site_logo'];
-        if (logo) {
-            document.getElementById('logoImg').src       = logo;
+        if (data.site_logo) {
+            document.getElementById('logoImg').src = data.site_logo;
             document.getElementById('logoPreview').style.display = 'block';
         }
     }
@@ -147,21 +145,11 @@
         e.preventDefault();
         const alertEl = document.getElementById('alert');
         alertEl.style.display = 'none';
-
         const body = {};
-        fields.forEach(key => {
-            body[key] = document.getElementById(key)?.value ?? '';
-        });
-
+        fields.forEach(key => { body[key] = document.getElementById(key)?.value ?? ''; });
         const data = await api('PUT', '/settings/index.php', body);
-
-        if (data?.error) {
-            alertEl.textContent   = data.error;
-            alertEl.className     = 'alert alert-error';
-        } else {
-            alertEl.textContent   = data?.message ?? 'Guardado correctamente';
-            alertEl.className     = 'alert alert-success';
-        }
+        alertEl.textContent   = data?.error ?? data?.message ?? 'Guardado';
+        alertEl.className     = `alert alert-${data?.error ? 'error' : 'success'}`;
         alertEl.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
