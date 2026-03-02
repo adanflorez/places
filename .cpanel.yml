@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/mmjgxocntgiz/places.codebuilt.co/
+    - export DEPLOYPATH=/home/mmjgxocntgiz/public_html/places.codebuilt.co/
     - /bin/cp -R . $DEPLOYPATH
