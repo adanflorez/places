@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lugar — The Palatin Admin</title>
     <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class="admin-layout">
@@ -55,8 +56,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Amenidades</label>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+                            <label style="margin:0">Amenidades</label>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleAddAmenity()">+ Nueva amenidad</button>
+                        </div>
                         <div class="amenities-grid" id="amenitiesGrid">Cargando...</div>
+
+                        <!-- Panel para agregar nueva amenidad -->
+                        <div class="add-amenity-panel" id="addAmenityPanel">
+                            <p style="font-size:.8rem;color:#888;margin-bottom:.5rem">Selecciona un ícono y escribe el nombre:</p>
+                            <div class="icon-picker" id="iconPicker"></div>
+                            <div style="display:flex;gap:.5rem;margin-top:.5rem">
+                                <input id="newAmenityName" type="text" class="form-control" placeholder="Nombre de la amenidad" style="flex:1">
+                                <button type="button" class="btn btn-primary" onclick="saveNewAmenity()">Agregar</button>
+                                <button type="button" class="btn" style="background:#eee;color:#333" onclick="toggleAddAmenity()">Cancelar</button>
+                            </div>
+                            <div id="amenityAlert" class="alert" style="display:none;margin-top:.5rem"></div>
+                        </div>
                     </div>
 
                     <div style="display:flex;gap:.75rem;margin-top:1rem">
@@ -109,6 +125,62 @@
                     .replace(/\s+/g, '-');
             }
         });
+
+        // Íconos disponibles para amenidades
+        const AMENITY_ICONS = [
+            'fa fa-wifi','fa fa-car','fa fa-bath','fa fa-snowflake-o','fa fa-fire',
+            'fa fa-television','fa fa-cutlery','fa fa-coffee','fa fa-tint','fa fa-bolt',
+            'fa fa-paw','fa fa-bicycle','fa fa-ship','fa fa-bed','fa fa-home',
+            'fa fa-umbrella','fa fa-sun-o','fa fa-tree','fa fa-music','fa fa-gamepad',
+            'fa fa-bell','fa fa-star','fa fa-map-marker','fa fa-phone',
+            'fa fa-lock','fa fa-shield','fa fa-plus-square','fa fa-flag',
+        ];
+        let selectedIcon = AMENITY_ICONS[0];
+
+        function buildIconPicker() {
+            const picker = document.getElementById('iconPicker');
+            picker.innerHTML = AMENITY_ICONS.map(ic => `
+                <div class="icon-option ${ic === selectedIcon ? 'active' : ''}" title="${ic}" onclick="selectIcon('${ic}',this)">
+                    <i class="${ic}"></i>
+                </div>`).join('');
+        }
+
+        function selectIcon(icon, el) {
+            selectedIcon = icon;
+            document.querySelectorAll('.icon-option').forEach(o => o.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function toggleAddAmenity() {
+            const panel = document.getElementById('addAmenityPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                buildIconPicker();
+                document.getElementById('newAmenityName').focus();
+            }
+        }
+
+        async function saveNewAmenity() {
+            const name    = document.getElementById('newAmenityName').value.trim();
+            const alertEl = document.getElementById('amenityAlert');
+            if (!name) { alertEl.textContent='Escribe un nombre'; alertEl.className='alert alert-error'; alertEl.style.display='block'; return; }
+
+            const data = await api('POST', '/places/amenities.php', { name, icon: selectedIcon });
+            if (data?.error) {
+                alertEl.textContent = data.error; alertEl.className = 'alert alert-error'; alertEl.style.display = 'block';
+                return;
+            }
+            // Agregar al grid con checkbox marcado
+            const grid  = document.getElementById('amenitiesGrid');
+            const label = document.createElement('label');
+            label.className = 'amenity-check';
+            label.innerHTML = `<input type="checkbox" name="amenity" value="${data.id}" checked><i class="${data.icon}"></i> ${data.name}`;
+            grid.appendChild(label);
+
+            document.getElementById('newAmenityName').value = '';
+            alertEl.style.display = 'none';
+            document.getElementById('addAmenityPanel').classList.remove('open');
+        }
 
         // Cargar amenidades
         async function loadAmenities(selected = []) {
