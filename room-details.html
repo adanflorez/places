@@ -37,7 +37,7 @@
                     <nav class="classy-navbar justify-content-between" id="palatinNav">
 
                         <!-- Nav brand -->
-                        <a href="index.html" class="nav-brand"><img src="img/core-img/logo.png" alt=""></a>
+                        <a href="index.html" class="nav-brand"><img id="site-logo-nav" src="img/core-img/logo.png" alt="The Palatin"><span id="site-name-nav" class="site-name" style="display:none;font-weight:700;font-size:1.3rem;color:#fff">The Palatin</span></a>
 
                         <!-- Navbar Toggler -->
                         <div class="classy-navbar-toggler">
@@ -214,8 +214,9 @@
                 <!-- Footer Widget Area -->
                 <div class="col-12 col-lg-5">
                     <div class="footer-widget-area mt-50">
-                        <a href="#" class="d-block mb-5"><img src="img/core-img/logo.png" alt=""></a>
-                        <p>The Palatin es tu plataforma de confianza para encontrar y reservar alojamientos únicos. Conectamos viajeros con anfitriones verificados en los destinos más increíbles del mundo.</p>
+                        <a href="#" class="d-block mb-5"><img id="site-logo-footer" src="img/core-img/logo.png" alt="The Palatin"></a>
+                        <h6 id="site-name-footer" class="site-name" style="display:none;margin-bottom:.75rem;color:#fff">The Palatin</h6>
+                        <p id="site-description">The Palatin es tu plataforma de confianza para encontrar y reservar alojamientos únicos. Conectamos viajeros con anfitriones verificados en los destinos más increíbles del mundo.</p>
                     </div>
                 </div>
 
@@ -257,18 +258,23 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
     <!-- Active js -->
     <script src="js/active.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/settings.js"></script>
     <script>
-        const WA_NUMBER = '573163625781';
-        const id        = new URLSearchParams(location.search).get('id');
+        const id = new URLSearchParams(location.search).get('id');
 
         if (!id) window.location.href = 'rooms.html';
 
         async function loadPlace() {
-            const place = await api('GET', `/places/index.php?id=${id}`);
+            const [place, settings] = await Promise.all([
+                api('GET', `/places/index.php?id=${id}`),
+                getSettings(),
+            ]);
+            const WA_NUMBER = settings?.whatsapp || '573163625781';
             if (!place || !place.id) { window.location.href = 'rooms.html'; return; }
 
             // Título de la página
-            document.title = `${place.name} — The Palatin`;
+            const siteSettings = await getSettings();
+            document.title = `${place.name} — ${siteSettings?.site_name || 'The Palatin'}`;
 
             // Imágenes del carrusel
             const carousel = document.querySelector('.room-thumbnail-slides');
@@ -325,8 +331,10 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
         loadPlace();
 
         // WhatsApp con datos del lugar
-        document.getElementById('reservationForm').addEventListener('submit', function (e) {
+        document.getElementById('reservationForm').addEventListener('submit', async function (e) {
             e.preventDefault();
+            const settings  = await getSettings();
+            const WA_NUMBER = settings?.whatsapp || '573163625781';
             const placeName = document.querySelector('.room-content h4')?.textContent?.trim() || 'el lugar';
             const checkIn   = document.getElementById('checkIn').value;
             const checkOut  = document.getElementById('checkOut').value;
